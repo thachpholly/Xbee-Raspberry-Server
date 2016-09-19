@@ -12,11 +12,15 @@ def create_connect():
 	return s
 
 def Sent_to_host(data):
-	socket_name = create_connect()
-	socket_name.sendall(data)
-	socket_name.close()
-	dat = data_manager.data_manager()
-	dat.sent_Host(data)
+	try:
+		socket_name = create_connect()
+		socket_name.sendall(data)
+		socket_name.close()
+		dat = data_manager.data_manager()
+		dat.sent_Host('OK' + data)
+	except Exception, e:
+		dat.sent_Host('Fail' + data)
+	
 
 def sendToHost(filename, socket_name):
 	f = open(filename)
