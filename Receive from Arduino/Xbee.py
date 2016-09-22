@@ -11,6 +11,7 @@ class Xbee:
 
 	#the function use Xbee to sent data to Xbee then has adrress is (DH, DL).
 	def sent_data(self, xbee_device, data, DH, DL):
-		# xbee_device use Lock to share other thread. it much lock before using and unlock after using
+		# xbee_device use "Lock" to share other thread. it much lock before using and unlock after using
+		# xbee_device is an object of module Serial(comunicate serial port) to comunicate Xbee device
 		pass
 		
