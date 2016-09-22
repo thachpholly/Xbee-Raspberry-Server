@@ -1,8 +1,9 @@
 import imp
 import time
 
-config = imp.load_source('module.name', "..\\config.py")
-
+config = imp.load_source('module.name', "config.py")
+import os
+#print os.getcwd()
 class data_manager:
 	"""docstring for data_manager"""
 	def __init__(self):

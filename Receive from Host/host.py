@@ -1,9 +1,9 @@
 import socket
 import time
 #from sendToAirduino import send_command
-import imp
-config = imp.load_source('module.name', "..\\config.py")
-data_manager = imp.load_source('data_manager', "..\\Storage\\Storage.py")
+#import imp
+#config = imp.load_source('module.name', "../config.py")
+#data_manager = imp.load_source('data_manager', "../Storage/Storage.py")
 import thread
 import threading
 
@@ -24,7 +24,7 @@ def secsion(conn, adrr):
 def hh(s):
 	for x in xrange(1,10):
 		print x, s
-def rasp_listen(HOST, PORT):
+def rasp_listen(HOST, PORT, da_ma):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.bind((HOST, PORT))
 	s.listen(1)
@@ -32,11 +32,11 @@ def rasp_listen(HOST, PORT):
 		conn, adrr = s.accept()
 		data = secsion(conn, adrr)
 		print 'recieved: ', data
-		da_ma = data_manager.data_manager()
+		#da_ma = data_manager.data_manager()
 		da_ma.receive_Host('OK' + data)
 	
-thread1 = threading.Thread(target=rasp_listen, args=(config.HOST,config.PORT,))
-thread1.start()
+#thread1 = threading.Thread(target=rasp_listen, args=(config.HOST,config.PORT,))
+#thread1.start()
 
-print 'completed', config.HOST, config.PORT
+#print 'completed', config.HOST, config.PORT
 #rasp_listen(config.HOST, config.PORT)

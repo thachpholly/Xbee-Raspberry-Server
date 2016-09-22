@@ -2,13 +2,13 @@ import socket
 import time
 
 import imp
-config = imp.load_source('config', "..\\config.py")
-data_manager = imp.load_source('data_manager', "..\\Storage\\Storage.py")
+#config = imp.load_source('config', "../config.py")
+#data_manager = imp.load_source('data_manager', "../Storage/Storage.py")
 
 def create_connect():
 	print (config.SERVER, config.PORT)
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect((config.SERVER, 3129))
+	s.connect((config.SERVER, config.PORT))
 	return s
 
 def Sent_to_host(data, dat):
@@ -35,9 +35,8 @@ def sendToHost(filename, socket_name):
 	socket_name.close()
 
 #s = create_connect('localhost',3129)
-dat = data_manager.data_manager()
-while 1:
-	Sent_to_host("123", dat)
-	time.sleep(1)
-Sent_to_host("hello12")
+#dat = data_manager.data_manager()
+#while 1:
+	#Sent_to_host("123", dat)
+	#time.sleep(1)
 #sendToHost("D:\\demo.txt", s)
