@@ -1,7 +1,8 @@
 import socket
 import time
-from sendToAirduino import send_command
-import config
+#from sendToAirduino import send_command
+import imp
+config = imp.load_source('module.name', "..\\config.py")
 import thread
 import threading
 
