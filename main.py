@@ -5,6 +5,8 @@ import imp
 import time
 import socket
 import threading
+import config
+
 
 config = imp.load_source('module.name', "config.py")
 data_manager = imp.load_source('data_manager', "Storage/Storage.py")
@@ -18,7 +20,6 @@ print config.HOST, config.PORT
 
 thread1 = threading.Thread(target=re_host.rasp_listen, args=('localhost',config.PORT, dat))
 thread1.start()
-
 
 
 while 1:
