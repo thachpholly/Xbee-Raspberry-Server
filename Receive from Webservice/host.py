@@ -24,7 +24,7 @@ def secsion(conn, adrr):
 def hh(s):
 	for x in xrange(1,10):
 		print x, s
-def rasp_listen(HOST, PORT, da_ma):
+def rasp_listen(HOST, PORT, da_ma, gui):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.bind((HOST, PORT))
 	s.listen(1)
@@ -32,8 +32,9 @@ def rasp_listen(HOST, PORT, da_ma):
 		conn, adrr = s.accept()
 		data = secsion(conn, adrr)
 		print 'recieved: ', data
+		gui.change_Tem(data[0:len(data)-1])
 		#da_ma = data_manager.data_manager()
-		da_ma.receive_Host('OK' + data)
+		#da_ma.receive_Host('OK' + data)
 	
 #thread1 = threading.Thread(target=rasp_listen, args=(config.HOST,config.PORT,))
 #thread1.start()

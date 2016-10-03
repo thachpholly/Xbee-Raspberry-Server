@@ -1,7 +1,10 @@
 #define comunicate with Host
-HOST = '192.168.137.48'
-PORT = 3129
-SERVER = '192.168.137.1'
+
+STATION_ID '01'
+
+HOST = '192.168.0.106'
+PORT = 3128
+SERVER = '192.168.0.106'
 
 #define file name to save data.
 xBeePath = "Data/xBee.txt"
