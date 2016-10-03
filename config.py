@@ -1,10 +1,11 @@
 #define comunicate with Host
 
-STATION_ID '01'
+STATION_ID  ='01'
 
-HOST = '192.168.0.106'
-PORT = 3128
-SERVER = '192.168.0.106'
+RASP_IP = '192.168.0.106'
+WEBSERVICE_PORT = 3129
+WEBSERVICE_IP = '192.168.0.106'
+FORM_INPUT_PATH = "/demo_websocket/form.html"
 
 #define file name to save data.
 xBeePath = "Data/xBee.txt"

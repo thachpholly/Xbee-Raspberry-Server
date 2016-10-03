@@ -11,9 +11,9 @@ def create_connect(SERVER, PORT):
 	s.connect((SERVER, PORT))
 	return s
 
-def Sent_to_host(data, dat):
+def Sent_to_host(data, dat=None):
 	try:
-		socket_name = create_connect('192.168.0.106', 3129)
+		socket_name = create_connect('localhost', 9001)
 		socket_name.sendall(data)
 		socket_name.close()
 		
@@ -38,5 +38,6 @@ def sendToHost(filename, socket_name):
 
 #s = create_connect('localhost',3129)
 #dat = data_manager.data_manager()
-
+while 1:
+	Sent_to_host('123')
 #sendToHost("D:\\demo.txt", s)
