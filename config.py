@@ -3,8 +3,8 @@
 STATION_ID  ='01'
 
 RASP_IP = '192.168.0.106'
-WEBSERVICE_PORT = '55555'
-WEBSERVICE_IP = 'localhost'
+WEBSERVICE_PORT = '80'
+WEBSERVICE_IP = 'pholly.esy.es'
 FORM_INPUT_PATH = "/demo_websocket/form.html"
 
 #define file name to save data.
