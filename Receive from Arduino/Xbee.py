@@ -14,7 +14,7 @@ class Xbee:
                 countValue = 0
                 while True:
                         # send 10 times if arduino is not respond
-                        if countValue == 3:
+                        if countValue == 10:
                                 #write file
                                 storage.sent_arduino("Fail" + " " + charIdControl + data)
                                 return False
