@@ -69,7 +69,7 @@ class data_manager:
 		else:
 			self.write_new(data, path, time.strftime("%x"))
 			
-		print '['+ time.strftime("%x") +']write data: "', data , '" to ' , path
+		#print '['+ time.strftime("%x") +']write data: "', data , '" to ' , path
 
 	def receive_arduino(self, data):
 		self.load_path()
