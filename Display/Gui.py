@@ -17,12 +17,21 @@ class Node:
         self.sizelabel = 20
 
         self.start_pos_ID = 5
+<<<<<<< HEAD
         self.start_pos_Time = 80
         self.start_pos_airTemp = 190
         self.start_pos_airhum = 390
         self.start_pos_soiltemp = 570
         self.start_pos_soilmoi = 710
         self.start_pos_lightin = 830
+=======
+        self.start_pos_Time = 100
+        self.start_pos_airTemp = 250
+        self.start_pos_airhum = 510
+        self.start_pos_soiltemp = 750
+        self.start_pos_soilmoi = 930
+        self.start_pos_lightin = 1080
+>>>>>>> origin/master
 
         self.unit_airTemp = u' (C)'
         self.unit_airhum = ' (%)'
@@ -152,7 +161,11 @@ class App_Gui:
       self.canvas = tk.Canvas(window, width=window.winfo_width(), height=window.winfo_height(), bg="SteelBlue2")
       self.canvas.pack()
       self.pos_left = 50
+<<<<<<< HEAD
       self.sizelabel = 17
+=======
+      self.sizelabel = 20
+>>>>>>> origin/master
       self.config =config
       self.lb = self.canvas.create_text(window.winfo_width() / 2, 0, text= u'Thông tin cảm biến', font=('Helvetica Neue UltraLight', 35, 'bold'),
                       fill="white", tag='test', anchor='n')
@@ -163,12 +176,21 @@ class App_Gui:
 
       self.start_posX_tb = 80
       self.start_pos_ID = 5
+<<<<<<< HEAD
       self.start_pos_Time = 80
       self.start_pos_airTemp = 190
       self.start_pos_airhum = 390
       self.start_pos_soiltemp = 570
       self.start_pos_soilmoi = 710
       self.start_pos_lightin = 830
+=======
+      self.start_pos_Time = 100
+      self.start_pos_airTemp = 250
+      self.start_pos_airhum = 510
+      self.start_pos_soiltemp = 750
+      self.start_pos_soilmoi = 930
+      self.start_pos_lightin = 1080
+>>>>>>> origin/master
 
       self.row_count = 0
       self.length_row = 600
@@ -210,4 +232,8 @@ class App_Gui:
 
 
 
+<<<<<<< HEAD
 #t[2][1:len(t[2])], t[3][1:len(t[3])], t[4][1:len(t[4])], t[5][1:len(t[5])], t[6][1:len(t[6])-1]
+=======
+#t[2][1:len(t[2])], t[3][1:len(t[3])], t[4][1:len(t[4])], t[5][1:len(t[5])], t[6][1:len(t[6])-1]
+>>>>>>> origin/master

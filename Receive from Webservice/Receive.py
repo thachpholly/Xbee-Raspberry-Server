@@ -9,7 +9,11 @@ class Rasp_Receive:
        self.rasp_id_id = rasp_id_id
        self.password = password
        self.dat = dat
+<<<<<<< HEAD
     def receive_CMD(self, RASP_ID, PASS, Xbee):
+=======
+    def receive_CMD(self, RASP_ID, PASS):
+>>>>>>> origin/master
        #print 'http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+self.FORM_INPUT_PATH
        try:
          br=self.mechanize.Browser()
@@ -24,19 +28,33 @@ class Rasp_Receive:
          for x in xrange(0,len(t)):
             if len(t[x]) > 0:
               print 'Received command: ', t[x]
+<<<<<<< HEAD
               Xbee.send_data(t[x], '40F1ED40#')
+=======
+>>>>>>> origin/master
               self.dat.receive_Host("OK" + t[x])
          return True
        except Exception, e:
          return False
        
+<<<<<<< HEAD
     def rasp_listen(self, RASP_ID, PASS, Xbee):
         while 1:
           time.sleep(1)
           self.receive_CMD(RASP_ID, PASS, Xbee)
+=======
+    def rasp_listen(self, RASP_ID, PASS):
+        while 1:
+          time.sleep(1)
+          self.receive_CMD(RASP_ID, PASS)
+>>>>>>> origin/master
 
 
 #import mechanize
 #dat = None
 #re = Rasp_Receive(mechanize, 'localhost', '55555', '/demo_websocket/send.php', dat)
+<<<<<<< HEAD
 #re.receive_CMD('00', '123456')
+=======
+#re.receive_CMD('00', '123456')
+>>>>>>> origin/master

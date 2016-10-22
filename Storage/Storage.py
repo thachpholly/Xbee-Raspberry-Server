@@ -1,9 +1,8 @@
 import imp
 import time
 
-config = imp.load_source('module.name', "config.py")
-import os
-#print os.getcwd()
+config = imp.load_source('module.name', "..\\config.py")
+
 class data_manager:
 	"""docstring for data_manager"""
 	def __init__(self):
@@ -66,10 +65,15 @@ class data_manager:
 		f.close()
 		if line[0:len(line) - 1] == time.strftime("%x") :
 			self.write_to_end(data, path)
+			print '[old]write data: "', data , '" to ' , path
 		else:
 			self.write_new(data, path, time.strftime("%x"))
+<<<<<<< HEAD
 			
 		#print '['+ time.strftime("%x") +']write data: "', data , '" to ' , path
+=======
+			print '['+ time.strftime("%x") +']write data: "', data , '" to ' , path
+>>>>>>> origin/master
 
 	def receive_arduino(self, data):
 		self.load_path()
