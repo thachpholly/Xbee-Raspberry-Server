@@ -1,11 +1,29 @@
 #define comunicate with Host
 
-STATION_ID  ='01'
+STATION_ID  ='00'
+STATION_PASS = '123456'
 
 RASP_IP = '192.168.0.106'
 WEBSERVICE_PORT = '80'
 WEBSERVICE_IP = 'pholly.esy.es'
-FORM_INPUT_PATH = "/demo_websocket/form.html"
+FORM_INPUT_PATH = "http://caphesuada.xyz/smartgarden/stats/insert"
+FORM_SEND_PATH = "/demo_websocket/send.php"
+NODE_TYPE1 = 1
+NODE_TYPE2 = 2
+
+#define sensor warning
+ligth_intensity_w = 100
+temperature_w = 30
+air_humidity_w = 34
+soil_temperature_w = 34
+soil_moisture_w = 34
+
+#define sensor dengerous
+ligth_intensity_d = 500
+temperature_d = 54
+air_humidity_d = 54
+soil_temperature_d = 54
+soil_moisture_d = 54
 
 #define file name to save data.
 xBeePath = "Data/xBee.txt"
