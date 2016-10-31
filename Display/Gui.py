@@ -158,6 +158,9 @@ class App_Gui:
                       fill="white", tag='test', anchor='n')
       self.lb_tb = self.canvas.create_text(5, 50, text= u'Mã Nút  Thời gian  Nhiệt độ không khí  Độ ẩm không khí  Nhiệt độ đất  Độ ẩm đất  Cường độ ánh sáng', font=('Helvetica Neue UltraLight', self.sizelabel, 'bold'),
                       fill="white", tag='test', anchor='nw')
+
+      self.lb_Spec = self.canvas.create_text(window.winfo_width() / 2, window.winfo_height() - 100, text= u'Mã Nút: N/A  Thời gian: N/A  Tốc độ gió: N/A  Hướng gió: N/A  Lượng mưa: N/A', font=('Helvetica Neue UltraLight', self.sizelabel, 'bold'),
+                      fill="white", tag='test', anchor='s')
       
       self.list_node = Node_manager(self.canvas, config)
 
@@ -206,6 +209,10 @@ class App_Gui:
         node = Node(nodeID, Time, temperature, air_humidity, soil_temperature, soil_moisture, ligth_intensity) 
         self.list_node.add_Node(node)
         self.row_count =  self.row_count + 1
+    def update_sensor_1(self, root, data):
+        t = data.split(',')
+        self.canvas.itemconfig(self.lb_Spec, text=u'Mã Nút: '+t[1][0:len(t[1])]+u'  Thời gian: '+t[0][1:len(t[0])]+u'  Tốc độ gió: '+t[2][0:len(t[2])]+u'(m/s)  Hướng gió: '+t[3][0:len(t[3])]+u'  Lượng mưa: ' + t[4][0:len(t[4])-1] +'(mm)') 
+
 
 
 

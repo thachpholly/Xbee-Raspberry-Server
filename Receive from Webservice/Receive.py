@@ -24,7 +24,7 @@ class Rasp_Receive:
          for x in xrange(0,len(t)):
             if len(t[x]) > 0:
               print 'Received command: ', t[x]
-              Xbee.send_data(t[x], '40F1ED40#')
+              #Xbee.send_data(t[x], '40F1ED40#')
               self.dat.receive_Host("OK" + t[x])
          return True
        except Exception, e:

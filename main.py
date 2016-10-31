@@ -27,21 +27,29 @@ def main_thread(root):
     Receive_WebService = module_receivefromWebservice.Rasp_Receive(mechanize, config.WEBSERVICE_IP, config.WEBSERVICE_PORT, config.FORM_SEND_PATH, module_data_manager)
     senttoWebservice = module_senttoWebservice.Client(mechanize, config.WEBSERVICE_IP, config.WEBSERVICE_PORT, config.FORM_INPUT_PATH, module_data_manager)
     #Xbee = module_Xbee.Xbee(Xbee_device, dat)
-    #Xbee = None
+    Xbee = None
 
-    #thread1 = threading.Thread(target=Receive_WebService.rasp_listen, args=(config.STATION_ID, config.STATION_PASS, Xbee))
-    #thread1.start()
+    thread1 = threading.Thread(target=Receive_WebService.rasp_listen, args=(config.STATION_ID, config.STATION_PASS, Xbee))
+    thread1.start()
     #Xbee.listen_from_node(senttoWebservice, config.STATION_ID, config.STATION_PASS, config.NODE_TYPE1, gui, root)
-    sen = module_data_manager.Sensor_data('(10:12:59,1,12,23,34,45,58)', '1')
-    sen.save()
+    
+    #sen.save()
+    #sen.get_data()
+    #sen = module_data_manager.Sensor_data('(10:12:59,1,12,23,34)',config, config.NODE_TYPE2)
+    #sen.save()
     #while 1:
         
-        #gui.displaynode(root, '(10:12:59,00,12,23,34,45,56)')
-        #gui.displaynode(root, '(10:12:59,02,12,23,34,45,56)')
-        #gui.displaynode(root, '(10:12:59,04,12,23,34,45,56)')
-        #gui.displaynode(root, '(10:12:59,07,12,23,34,45,56)')
-        #senttoWebservice.sent_data('(10:12:59,1,12,23,34,45,'+str(random.randint(0,50))+')', config.NODE_TYPE1)
-        #time.sleep(3)
+    gui.displaynode(root, '(10:12:59,00,12,23,34,45,55)')
+    gui.displaynode(root, '(10:12:59,02,12,23,34,45,56)')
+    #gui.displaynode(root, '(10:12:59,04,34,23,34,45,56)')
+    #gui.displaynode(root, '(10:12:59,07,12,23,34,45,56)')
+    gui.update_sensor_1(root, '(10:12:5,2,14,23,24)')
+    while 1:
+        sen = module_data_manager.Sensor_data('('+str(random.randint(0,23))+':'+str(random.randint(0,50))+':'+str(random.randint(0,50))+',01,'+str(random.randint(0,50))+','+str(random.randint(0,99))+','+str(random.randint(0,50))+','+str(random.randint(0,99))+','+str(random.randint(0,150))+')',config, config.NODE_TYPE1)
+        thread3 = threading.Thread(target=senttoWebservice.sent_data, args=(sen, config.NODE_TYPE1))    
+        thread3.start()
+        gui.displaynode(root, sen.get_data())
+        time.sleep(5)
 
 
 root = tk.Tk()

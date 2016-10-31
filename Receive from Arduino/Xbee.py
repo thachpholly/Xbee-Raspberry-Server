@@ -25,7 +25,7 @@ class Xbee:
                         for i in data:
                                 self.ser.write(i)
                         print 'Sent to node: ' + data #for debugging
-                        self.storage.sent_arduino("Ok" + " " + charIdControl + data)
+                        #self.storage.sent_arduino("Ok" + " " + charIdControl + data)
                         return True    
                         
 
@@ -36,8 +36,8 @@ class Xbee:
                         if data != '#':
                                 print 'Received from node: ' , data #for debugging
                                 gui.displaynode(root, data)
-                                thread1 = threading.Thread(target=send_webservice.sent_data, args=(data, nodetype))
-                                thread1.start()
+                                #thread1 = threading.Thread(target=send_webservice.sent_data, args=(data, nodetype))
+                                #thread1.start()
                                 #send_webservice.sent_data(data, nodetype)
                                 
         def receive_data(self, data):
@@ -53,7 +53,7 @@ class Xbee:
                         #print 'Received from node--: ' , data #for debugging
                         #write file
                         data = '(' + data + ')'
-                        self.storage.receive_arduino(data)
+                        #self.storage.receive_arduino(data)
                         
                         return data
                 return '#'

@@ -4,9 +4,9 @@ STATION_ID  ='00'
 STATION_PASS = '123456'
 
 RASP_IP = '192.168.0.106'
-WEBSERVICE_PORT = '80'
-WEBSERVICE_IP = 'pholly.esy.es'
-FORM_INPUT_PATH = "http://caphesuada.xyz/smartgarden/stats/insert"
+WEBSERVICE_PORT = '55555'
+WEBSERVICE_IP = 'localhost'
+FORM_INPUT_PATH = "http://localhost:55555/demo_websocket/show_data.php"
 FORM_SEND_PATH = "/demo_websocket/send.php"
 NODE_TYPE1 = 1
 NODE_TYPE2 = 2
