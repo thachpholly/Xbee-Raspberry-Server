@@ -5,8 +5,8 @@ STATION_PASS = '123456'
 
 RASP_IP = '192.168.0.106'
 WEBSERVICE_PORT = '55555'
-WEBSERVICE_IP = 'localhost'
-FORM_INPUT_PATH = "http://localhost:55555/demo_websocket/show_data.php"
+WEBSERVICE_IP = '172.30.248.58'
+FORM_INPUT_PATH = "http://172.30.248.58:55555/demo_websocket/show_data.php"
 FORM_SEND_PATH = "/demo_websocket/send.php"
 NODE_TYPE1 = 1
 NODE_TYPE2 = 2
