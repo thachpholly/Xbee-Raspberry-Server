@@ -212,9 +212,3 @@ class App_Gui:
     def update_sensor_1(self, root, data):
         t = data.split(',')
         self.canvas.itemconfig(self.lb_Spec, text=u'Mã Nút: '+t[1][0:len(t[1])]+u'  Thời gian: '+t[0][1:len(t[0])]+u'  Tốc độ gió: '+t[2][0:len(t[2])]+u'(m/s)  Hướng gió: '+t[3][0:len(t[3])]+u'  Lượng mưa: ' + t[4][0:len(t[4])-1] +'(mm)') 
-
-
-
-
-
-#t[2][1:len(t[2])], t[3][1:len(t[3])], t[4][1:len(t[4])], t[5][1:len(t[5])], t[6][1:len(t[6])-1]

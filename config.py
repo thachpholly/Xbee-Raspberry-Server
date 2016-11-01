@@ -5,9 +5,10 @@ STATION_PASS = '123456'
 
 RASP_IP = '192.168.0.106'
 WEBSERVICE_PORT = '55555'
-WEBSERVICE_IP = '172.30.248.58'
-FORM_INPUT_PATH = "http://172.30.248.58:55555/demo_websocket/show_data.php"
-FORM_SEND_PATH = "/demo_websocket/send.php"
+WEBSERVICE_IP = 'localhost'
+FORM_INPUT_PATH = "http://localhost:55555/demo_websocket/show_data.php"
+FORM_SEND_PATH = "/demo_websocket/command.php"
+CONFIG_PATH = "/demo_websocket/get_config.php"
 NODE_TYPE1 = 1
 NODE_TYPE2 = 2
 
@@ -24,6 +25,7 @@ temperature_d = 54
 air_humidity_d = 54
 soil_temperature_d = 54
 soil_moisture_d = 54
+
 
 #define file name to save data.
 xBeePath = "Data/xBee.txt"
@@ -71,3 +73,38 @@ Su_re_ard = "Data/Su_re_ard.txt"
 Su_se_ard = "Data/Su_se_ard.txt"
 Su_se_Host = "Data/Su_se_Host.txt"
 Su_re_Host = "Data/Su_re_Host.txt"
+
+
+
+
+
+def save_config(strJson, json):
+	global ligth_intensity_w 
+	global temperature_w
+	global air_humidity_w
+	global soil_temperature_w
+	global soil_moisture_w
+
+	global ligth_intensity_d
+	global temperature_d
+	global air_humidity_d
+	global soil_temperature_d
+	global soil_moisture_d
+
+	#print strJson
+
+	ligth_intensity_w = strJson['ligth_intensity_w']
+	temperature_w = strJson['temperature_w']
+	air_humidity_w = strJson['air_humidity_w']
+	soil_temperature_w = strJson['soil_temperature_w']
+	soil_moisture_w = strJson['soil_moisture_w']
+
+	ligth_intensity_d = strJson['ligth_intensity_d']
+	temperature_d = strJson['temperature_d']
+	air_humidity_d = strJson['air_humidity_d']
+	soil_temperature_d = strJson['soil_temperature_d']
+	soil_moisture_d = strJson['soil_moisture_d']
+	with open('config.json', 'w') as outfile:
+		r = json.dumps(strJson)
+		json.dump(r, outfile)
+		

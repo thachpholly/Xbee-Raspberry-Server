@@ -108,6 +108,3 @@ class Sensor_data:
 		else:
 			self.init_header(self.get_path())
 			self.savetoFile(self.get_path(), isSent)
-			
-
-
