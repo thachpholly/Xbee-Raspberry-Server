@@ -19,7 +19,7 @@ class Rasp_Receive:
             'pass': '123456'
          }
          r = requests.post('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+self.FORM_INPUT_PATH, data=payload)
-         #print r.text.strip()
+         print r.text.strip()
          if len(r.text.strip()) > 0:
            t = r.text.strip().split(' ')
            #print len(r.text.strip())
@@ -31,6 +31,16 @@ class Rasp_Receive:
        except Exception, e:
          return False
     
+    def re_CMD(self, RASP_ID, PASS, Xbee):
+      r = requests.get('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+'/lenh')
+      #print r.text
+      jsondata = json.loads(r.text)
+      #print jsondata['data'][0]['lenh']
+      for x in xrange(0, len(jsondata['data'])):
+        print 'Received command: ', jsondata['data'][x]['lenh']
+        #Xbee.send_data( jsondata['data'][x]['lenh'], jsondata['data'][x]['id'])
+      
+
     def recieve_config(self, config):
       try:
          payload = {
@@ -52,12 +62,20 @@ class Rasp_Receive:
         while 1:
           time.sleep(0.5)
           #print '2'
-          self.receive_CMD(RASP_ID, PASS, Xbee)
+          self.re_CMD(RASP_ID, PASS, Xbee)
           #print '1'
-          self.recieve_config(config)
+          #self.recieve_config(config)
 
+
+#r =  requests.get('https://github.com')
+#s = requests.Session()
+#r = s.get('http://localhost:55555/demo_websocket/get_config.php')
+#print r.text
+#r.raise_for_status()
 
 #import mechanize
 #dat = None
 #re = Rasp_Receive(mechanize, 'localhost', '55555', '/demo_websocket/command.php', dat)
+#re.re_CMD('http://caphesuada.xyz/lenh')
+#re.rasp_listen('00', '123456', Xbe)
 #re.recieve_config(None)

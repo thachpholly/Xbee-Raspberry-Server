@@ -1,21 +1,16 @@
 import requests
 import random
 import json
+import ftplib
 class Client:
-    def __init__(self, mechanize, WEBSERVICE_IP,WEBSERVICE_PORT, FORM_INPUT_PATH, dat , data_id = 'data', rasp_id_id = 'rasp_id',password = 'pass'):
-       self.WEBSERVICE_PORT = WEBSERVICE_PORT
-       self.mechanize = mechanize
-       self.WEBSERVICE_IP = WEBSERVICE_IP
-       self.FORM_INPUT_PATH = FORM_INPUT_PATH
-       self.data_id = data_id
-       self.rasp_id_id = rasp_id_id
-       self.password = password
-       self.dat = dat
+    def __init__(self, config):
+       self.config = config
     
     def Send(self, data):
       #print 'h'
       try:
         #t = data.split(',')
+        #print '1'
         payload = {'time': data.getTime(),
             'nodeID': data.getnodeID(),
             'airTemperature': data.getairTemperature(),
@@ -23,35 +18,43 @@ class Client:
             'soilTemperature': data.getsoilTemperature(),
             'soilMoisture': data.getsoilMoisture(),
             'lightIntensity': data.getlightIntensity(),
+            'windVelocity' : data.windVelocity,
+            'winDirection' : data.winDirection,
+            'rain' : data.Rain
         }
         #print payload
-        r = requests.post(self.FORM_INPUT_PATH, data=payload)
+        #print 'http://' + self.config.WEBSERVICE_IP  +':'+self.config.WEBSERVICE_PORT+self.config.FORM_INPUT_PATH
+        r = requests.post('http://' + self.config.WEBSERVICE_IP  +':'+self.config.WEBSERVICE_PORT+self.config.FORM_INPUT_PATH, data=payload)
         message = "{\"message\":\"Record Inserted Successfully\"}"
-        message = "haha"
-        #print r.text
+        message = "OK"
+        print r.text
         if str(r.text) == message:
-          print 'Sent to web service successfully!'
+          print 'Sent to web service successfully!', data.get_data()
           return True;
       except Exception, e:
-        #raise e
+        raise e
         print 'Sent to web service Failed!', data.get_data()
         return False
 
-    def sent_data(self, sensor_data, TYPNODE ):
+    def sendFile(self, path, server, user, password):
+      try:
+        session = ftplib.FTP(server, user, password)
+        file = open(path,'rb')                  # file to send
+        session.storbinary('STOR ' + path, file)     # send the file
+        file.close()                                    # close file and FTP
+        session.quit()
+        return True
+      except Exception, e:
+        return False
+      
+    def sent_data(self, sensor_data, TYPNODE):
       num = 0
-      num1 = 5
-      num2 = 20
-      num3 = 0
       #print 'a'
-      while 1:
-        #print num
-        if (num == num1 or num == num2 or num == num3):
-
-          if self.Send(sensor_data) :
-            sensor_data.save()
-            return True
-        num = num + 1
-        time.sleep(1)
+      for x in xrange(0,self.config.send_repeat[len(self.config.send_repeat)-1]):
+          if x == self.config.send_repeat[num]:
+            if self.Send(sensor_data) :
+              return True
+          time.sleep(1)
       sensor_data.save(False)    
       return False
       

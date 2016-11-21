@@ -1,106 +1,159 @@
+#! /usr/bin/python
+
+from xbee import XBee
+from xbee.frame import APIFrame
 import time
-import imp
+import serial
 import threading
-#import serial
-#data_manager = imp.load_source('data_manager', "./Storage/Storage.py")
-#storage = data_manager.data_manager()
+##data_manager = imp.load_source('data_manager', "./Storage/Storage.py")
+##storage = data_manager.data_manager()
 
-class Xbee:
-        """docstring for Xbee"""
+"""
+Xbee.py
+By Nhut Tan Nguyen Dang, 2010
+
+Demonstrates reading the low-order address bits from an XBee Series 1
+device over a serial port (USB) in API-mode.
+"""
+class Xbee(XBee):
+    """docstring for Xbee"""
         
-        def __init__(self, ser, storage, config):
-                self.ser = ser
-                self.storage = storage
+    def __init__(self, ser, dat, config):
+        super(Xbee, self).__init__(ser)
+        self.flag=True
+        self.dat = dat
+        self.config = config
+
+
+    def wait_read_Packet(self, start_byte):
+        """
+        wait_read_Packet: None -> binary data
+
+        wait_read_Packet will read from the serial port until a valid
+        API frame arrives. It will then return the binary data
+        contained within the frame.
+
+        If this method is called as a separate thread
+        and self.thread_continue is set to False, the thread will
+        exit by raising a ThreadQuitException.
+        """
+        frame = APIFrame(escaped=self._escaped)
+        frame.fill(start_byte)
+        while True:
+                if self._callback and not self._thread_continue:
+                    raise ThreadQuitException
+                if self.serial.inWaiting() == 0:
+                    time.sleep(.01)
+                    continue
+
+                byte = self.serial.read()
+
+                # Save all following bytes, if they are not empty
+                if len(byte) == 1:
+                    frame.fill(byte)
+
+                while(frame.remaining_bytes() > 0):
+                    byte = self.serial.read()
+
+                    if len(byte) == 1:
+                        frame.fill(byte)
+
+                try:
+                    # Try to parse and return result
+                    frame.parse()
+
+                    # Ignore empty frames
+                    if len(frame.data) == 0:
+                        frame = APIFrame()
+                        continue
+
+                    return frame
+                except ValueError:
+                    # Bad frame, so restart
+                    frame = APIFrame(escaped=self._escaped)
+                    
+    def readPacket(self):
+        """
+        readPacket: None -> frame info dictionary
+
+        readPacket calls Xbee.readPacket() and waits until a
+        valid frame appears on the serial port. Once it receives a frame,
+        wait_read_frame attempts to parse the data contained within it
+        and returns the resulting dictionary
+        """
+        while self.flag==True:
+            self.flag=False
+            while True:
+                byte = ser.read()
+                #print byte  #debug
+                if byte == APIFrame.START_BYTE:
+                    frame = self.wait_read_Packet(byte)
+                    self.flag=True
+                    return self._split_response(frame.data)['rf_data']
+
+    def listen_from_node(self, send_webservice, STATION_ID, STATION_PASS, nodetype, gui, root):
+        while self.flag==True:
+                self.flag==False
+                while True:
+                        self.flag==False
+                        data = self.readPacket()
+                        if data != '':
+                                print 'Received from node: ' , data #for debugging
+                                gui.displaynode(root, data)
+                                sen = self.dat.Sensor_data(data, self.config, self.config.NODE_TYPE1)
+                                thread1 = threading.Thread(target=send_webservice.sent_data, args=(sen, STATION_ID, STATION_PASS))
+                                thread1.start()
+                                #send_webservice.sent_data(data, nodetype)
+                        self.flag = True
+                self.flag = True
+                break
+        
+    def send_command(self, addr, command):
+        while self.flag==True:
+            self.flag=False
+            countValue=0
+            while True:
+                if countValue==3:
+                    #write file
+                    #storage.sent_arduino("Fail" + " " + charIdControl + data)
+                    print "Write error"
+                    self.flag = True
+                    return
+                
+                self.send('tx', dest_addr=addr, data=command)
+                
                 self.flag=True
-                self.config = config
+                confirm = self.readPacket()
+                self.flag=False
+                if confirm == '0':
+                    print "Success"
+                    #storage.sent_arduino("Ok" + " " + charIdControl + data)
+                    self.flag = True
+                    break
+                countValue += 1
+            self.flag=True
+            break
+    
+##PORT = '/dev/ttyUSB0'
+##BAUD_RATE = 9600
+##ser = serial.Serial(PORT, BAUD_RATE, timeout=1)
+##
+###-------send
+##data = "000:1"
+##addr = "\x12\x34"
+##xb = Xbee(ser)
+##while True:
+##    print xb.readPacket()
 
-        def send_data(self, data, charIdControl):
-                while self.flag==True:
-                        print self.flag
-                        self.flag = False
-                        data += "#"
-                        countValue = 0
-                        while True:
-                                # send 10 times if arduino is not respond
-                                confirm = ""
-                                if countValue == 10:
-                                        #write file
-                                        #self.storage.sent_arduino("Fail" + " " + charIdControl + data)
-                                        self.flag = True
-                                        return
-                                
-                                for i in charIdControl:
-                                        self.ser.write(i)    
-                                print charIdControl #for debugging
+##def main():
+##   
+##    ##while True:
+##    ##    print xb.readPacket()
+##    thread1 = threading.Thread(target=xb.readPacket, args=())
+##    thread1.start()
+##
+##thread2 = threading.Thread(target=main, args=())
+##thread2.start()
 
-                                for j in data:
-                                        self.ser.write(j)
-                                print data #for debugging
-                                
-                                
-                                confirm = self.ser.read()
-                                if confirm == 'O':
-                                        print "Success---------"
-                                        #self.storage.sent_arduino("Ok" + " " + charIdControl + data)
-                                        self.flag = True
-                                        return True
-                                countValue += 1
-                        self.flag = True
-                        break
-
-        def listen_from_node(self, send_webservice, STATION_ID, STATION_PASS, nodetype, gui, root):
-                while self.flag==True:
-                        self.flag==False
-                        while 1:
-                                self.flag==False
-                                data = ''
-                                data = self.receive_data(data)
-                                if data != '#':
-                                        print 'Received from node: ' , data #for debugging
-                                        gui.displaynode(root, data)
-                                        sen = self.storage.Sensor_data(data, self.config, self.config.NODE_TYPE1)
-                                        thread1 = threading.Thread(target=send_webservice.sent_data, args=(sen, self.config.NODE_TYPE1))
-                                        thread1.start()
-                                        #send_webservice.sent_data(data, nodetype)
-                                self.flag = True
-                        self.flag = True
-                        break
-                                
-        def receive_data(self, data):
-                while self.flag==True:
-                        self.flag==False
-                        #print 'd'
-                        data = ''
-                        if str(self.ser.read()) == str('('):
-                                
-                                charReceive = ' '
-                                while str(charReceive) != str(')'):
-                                        charReceive = self.ser.read()
-                                        if str(charReceive) != str(')'):
-                                                data += charReceive
-                                #print 'Received from node--: ' , data #for debugging
-                                #write file
-                                data = '(' + data + ')'
-                                #self.storage.receive_arduino(data)
-                                self.flag==True
-                                return data
-                        self.flag==True
-                        return '#'
-                        
-
-"""PORT = '/dev/ttyUSB0'
-BAUD_RATE = 9600
-ser = serial.Serial(PORT, BAUD_RATE, timeout = 3)
-
--------send
-data = "Successly#"
-charIdControl = "40F1ED40#"
-xbObj = Xbee(ser)
-xbObj.send_data(data, charIdControl)
-
-----receive
-recedata = ""
-xbObj = Xbee(ser)
-while True:
-        xbObj.receive_data(recedata)"""
-
+"""xb = Xbee(ser)
+xb.send_command(addr, data)"""

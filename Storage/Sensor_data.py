@@ -17,12 +17,21 @@ class Sensor_data:
 			self.soilTemperature = t[4][0:len(t[4])]
 			self.soilMoisture = t[5][0:len(t[5])]
 			self.lightIntensity = t[6][0:len(t[6])-1]
+			self.windVelocity = 'N/A'
+			self.winDirection = 'N/A'
+			self.Rain = 'N/A'
+
 		if self.config.NODE_TYPE2 == typeNode:
 			self.time = t[0][1:len(t[0])]
 			self.nodeID = t[1][0:len(t[1])]
 			self.windVelocity = t[2][0:len(t[2])]
 			self.winDirection = t[3][0:len(t[3])]
 			self.Rain = t[4][0:len(t[4])-1]
+			self.airTemperature = 'N/A'
+			self.airHumidity = 'N/A'
+			self.soilTemperature = 'N/A'
+			self.soilMoisture = 'N/A'
+			self.lightIntensity = t[6][0:len(t[6])-1]
 			
 	def get_data(self):
 		return '('+self.time+','+self.nodeID+','+self.airTemperature+','+self.airHumidity+','+self.soilTemperature+','+self.soilMoisture+','+self.lightIntensity+')'
@@ -44,22 +53,15 @@ class Sensor_data:
 
 	def get_path(self):
 		weekday = time.strftime("%A")
-		if self.node_type == self.config.NODE_TYPE1:
-			return 'Data/' + weekday + '.csv'
-		if self.node_type == self.config.NODE_TYPE2:
-			return 'Data/' + weekday + '_'+ str(self.config.NODE_TYPE2)+'.csv'
+		return 'Data/' + weekday + '.csv'
+		
 
 	def init_header(self, path):
-		if self.node_type == self.config.NODE_TYPE1:
-			Header = [
-			    ['time', 'nodeID', 'airTemperature', 'airHumidity', 
-			    'soilTemperature', 'soilMoisture', 'lightIntensity', 'isSent']
-			]
-		if self.node_type == self.config.NODE_TYPE2:
-			Header = [
-			    ['time', 'nodeID', 'windVelocity', 'winDirection', 
-			    'Rain']
-			]
+		Header = [
+		    ['time', 'nodeID', 'airTemperature', 'airHumidity', 
+		    'soilTemperature', 'soilMoisture', 'lightIntensity', 'windVelocity', 'winDirection', 
+		    'Rain']
+		]
 		resultFile = open(path, 'wb')
 		wr = csv.writer(resultFile)
 		wr.writerow([time.strftime("%x")])
@@ -76,20 +78,10 @@ class Sensor_data:
 
 
 	def savetoFile(self, path, isSent = True, isAppend = True):
-		if isSent:
-			txt = 'True'
-		else:
-			txt = 'False'
-
-		if self.node_type == self.config.NODE_TYPE1:
-			DATA = [
+		DATA = [
 			    [self.time, self.nodeID, self.airTemperature, self.airHumidity, 
-			    self.soilTemperature, self.soilMoisture, self.lightIntensity, txt]
-			]
-		if self.node_type == self.config.NODE_TYPE2:
-			DATA = [
-			    [self.time, self.nodeID, self.windVelocity, self.winDirection, 
-			    self.Rain, txt]
+			    self.soilTemperature, self.soilMoisture, self.lightIntensity, self.windVelocity, self.winDirection, 
+			    self.Rain]
 			]
 		if isAppend:
 			resultFile = open(path, 'ab')
