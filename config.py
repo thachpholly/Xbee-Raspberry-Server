@@ -1,32 +1,47 @@
 # -*- coding: utf8 -*-
 import json
+
+xbee_drive = '/dev/ttyUSB0'
 #define comunicate with Host
 
-STATION_ID  ='00'
-STATION_PASS = '123456'
+STATION_ID  ='112233'
+STATION_PASS = '123'
 
 WEBSERVICE_PORT = '80'
-WEBSERVICE_IP = 'caphesuada.xyz'
-FORM_INPUT_PATH = "//smartgarden/stats/insert"
-FORM_SEND_PATH = "/lenh"
-CONFIG_PATH = "/demo_websocket/get_config.php"
+WEBSERVICE_IP = 'vuon.dhct.tech'
+FORM_INPUT_PATH = "/api/stats"
+FORM_SEND_PATH = "/api/commands"
+CONFIG_PATH = "/api/thresholds"
 NODE_TYPE1 = 1
 NODE_TYPE2 = 2
+TIME_RECIEVE = 2
+
+#define list_node
+# 'NodeID':'nodeAddress'
+map_address={
+        "1":"\x00\x13\xA2\x00\x40\xF1\xED\x40",
+        "2":"\x00\x13\xA2\x00\x40\xF1\xED\x0E"
+
+}
 
 #repeat send to web service after 0s, 5s, 20s if failed
 send_repeat = [0, 5, 20]
+#define set current working directory
+import os
+import sys
+os.chdir('/home/pi/Desktop/Xbee-Raspberry-Server')
+
 
 #define node config
 isNewConfig = False
-
 nodeConfig = None
 
 #define command to control device on Node(arduino)
 list_cmd ={
   "000:1": u'Bật tưới nhỏ giọt',
   "000:0": u'Tắt tưới nhỏ giọt',
-  "001:1": u'Bật tưới phung sương',
-  "001:0": u'Tắt tưới phung sương',
+  "001:1": u'Bật tưới phun sương',
+  "001:0": u'Tắt tưới phun sương',
   "002:1": u'Bật Màn che',
   "002:0": u'Tắt Màn che',
   "003:1": u'Bật Mái che',
@@ -118,56 +133,80 @@ Su_re_Host = "Data/Su_re_Host.txt"
 
 
 
-def save_config(strJson, json):
-	global ligth_intensity_w 
-	global temperature_w
-	global air_humidity_w
-	global soil_temperature_w
-	global soil_moisture_w
-	global wind_vel_w
-	global wind_dir_w
-	global rain_w
+def save_config(strJson, nodeID):
+        
+        #print strJson
+        if len(strJson) != 20:
+                return False
+	with open('Data/'+nodeID+'.json', 'w') as outfile:
+		#r = json.dumps(str(strJson))
+		
+		json.dump(strJson, outfile)
+		#print len(strJson), '-------'
+		return True
 
-	global ligth_intensity_d
-	global temperature_d
-	global air_humidity_d
-	global soil_temperature_d
-	global soil_moisture_d
-	global wind_vel_d
-	global wind_dir_d
-	global rain_d
+import threading
 
-	#print strJson
+lock = threading.Lock()
 
-	ligth_intensity_w = strJson['ligth_intensity_w']
-	temperature_w = strJson['temperature_w']
-	air_humidity_w = strJson['air_humidity_w']
-	soil_temperature_w = strJson['soil_temperature_w']
-	soil_moisture_w = strJson['soil_moisture_w']
-
-	ligth_intensity_d = strJson['ligth_intensity_d']
-	temperature_d = strJson['temperature_d']
-	air_humidity_d = strJson['air_humidity_d']
-	soil_temperature_d = strJson['soil_temperature_d']
-	soil_moisture_d = strJson['soil_moisture_d']
-	with open('config.json', 'w') as outfile:
-		r = json.dumps(strJson)
-		json.dump(r, outfile)
-
+config_node = ['default', None]
 
 def load_config(nodeID):
-	try:
-		with open('Data/'+nodeID+'.json', 'r') as outfile:
-			r = json.load(outfile)
-			nodeConfig = r
+	global config_node
+	if config_node[0] != nodeID:
+		lock.acquire()
+		try:
+			with open('Data/'+nodeID+'.json', 'r') as outfile:
+				r = json.load(outfile)
+				nodeConfig = r
+				lock.release()
+				config_node[0] = nodeID
+				config_node[1] = r
+				return r
+		except IOError as e:
+			with open('Data/default.json', 'r') as outfile:
+				print 'NOT FIND CONFIG!!! LOAD DEFAULT CONFIG'
+				r = json.load(outfile)
+				nodeConfig = r
+				lock.release()
+				config_node[0] = nodeID
+				config_node[1] = r
+			with open('Data/'+nodeID+'.json', 'w') as outfile1:
+				json.dump(r, outfile1)
 			return r
-	except Exception as e:
-		raise e
-		print u'Không tìm thấy cấu hình cho nút'
-		return None
+		except Exception as e:
+			raise e
+			print u'Không tìm thấy cấu hình cho nút'
+			lock.release()
+			return None
+	else:
+		lock.acquire()
+		try:
+			with open('Data/'+nodeID+'.json', 'r') as outfile:
+				r = json.load(outfile)
+				nodeConfig = r
+				lock.release()
+				config_node[0] = nodeID
+				config_node[1] = r
+				return r
+		except IOError as e:
+			with open('Data/default.json', 'r') as outfile:
+				print 'NOT FIND CONFIG!!! LOAD DEFAULT CONFIG'
+				r = json.load(outfile)
+				nodeConfig = r
+				lock.release()
+				config_node[0] = nodeID
+				config_node[1] = r
+			with open('Data/'+nodeID+'.json', 'w') as outfile1:
+				json.dump(r, outfile1)
+			return r
 	
 
+
+config_node = ['default', load_config('default')]
+
 def getConfig(nodeID):
+	lock.acquire()
 	try:
 		with open('Data/'+nodeID+'.json', 'r') as outfile:
 		#r = json.dumps(strJson)
@@ -183,7 +222,7 @@ def getConfig(nodeID):
 						t[i] += r[x]['action'][str(j)]+'|'
 					if len(r[x]['action']) > 0:
 						t[i] = t[i][0:len(t[i])-1]
-					print t[i]
+					#print t[i]
 					i = i + 1
 			i = 0
 			for x in xrange(0,len(r)):
@@ -194,20 +233,23 @@ def getConfig(nodeID):
 						t[i] += r[x]['action'][str(j)]+'|'
 					if len(r[x]['action']) > 0:
 						t[i] = t[i][0:len(t[i])-1]
-					print t[i]
+					#print t[i]
 					i = i + 1
 			result = ''
 			for x in t:
 				result += x + ','
-			print result[0:len(result)-1]
+			#print result[0:len(result)-1]
+			lock.release()
 			return result[0:len(result)-1]
 	except Exception as e:
-		#raise e
+		raise e
 		print 'GetJSON error'
+		lock.release()
 		return ''
 
 def saveAlarm(nodeID, sensorName, values, type = 'max', ls_cmd = []):
 	#print nodeID, sensorName, values, type , ls_cmd
+	lock.acquire()
 	try:
 		with open('Data/'+nodeID+'.json', 'r') as outfile:
 		#r = json.dumps(strJson)
@@ -215,26 +257,24 @@ def saveAlarm(nodeID, sensorName, values, type = 'max', ls_cmd = []):
 			for x in r:
 				if x['stat_type'] == sensorName and x['type'] == 'alarm' and x['threshold_type'] == type:
 					x['threshold_value'] = str(values)
-					action = {}
-					i = 0
-					for t in ls_cmd:
-						action[str(i)] = t
-						i = i + 1
-					x['action'] = action
-					print x
+					x['action'] = ls_cmd
+					#print x
 					outfile.close()
 					
 	except Exception as e:
-		#raise e
+		raise e
 		print 'GetJSON error'
+		lock.release()
 		return False
 	with open('Data/'+nodeID+'.json', 'w') as outfile1:
 		json.dump(r, outfile1)
 	#json.dump(r, outfile)
 	isNewConfig = True
+	lock.release()
 	return True	
 
 def saveWarning(nodeID, sensorName, values, type = 'max'):
+	lock.acquire()
 	#print nodeID, sensorName, values, type , ls_cmd
 	try:
 		with open('Data/'+nodeID+'.json', 'r') as outfile:
@@ -244,19 +284,70 @@ def saveWarning(nodeID, sensorName, values, type = 'max'):
 				if x['stat_type'] == sensorName and x['type'] == 'warning' and x['threshold_type'] == type:
 					x['threshold_value'] = str(values)
 	except Exception as e:
-		#raise e
+		raise e
 		print 'GetJSON error'
+		lock.release()
 		return False
 	with open('Data/'+nodeID+'.json', 'w') as outfile1:
 		json.dump(r, outfile1)
 	#json.dump(r, outfile)
 	isNewConfig = True
-	return True	
+	lock.release()
+	return True
+import requests
+def send_config_web(node_id, stat_type, threshold_type, threshold_level):
+    try:
+        result = None
+        lock.acquire()
+        with open('Data/'+node_id+'.json', 'r') as outfile:
+                r = json.load(outfile)
+                #print r
+        for x in r:
+            #print x
+            if x['stat_type'] == stat_type and x['threshold_type'] == threshold_type and x['type'] == threshold_level:
+                result = x
+        lock.release()
+                #print x
+        t = requests.get('http://vuon.dhct.tech/debug/token')
+        token = 'Bearer ' + t.text
+        headers = {
+            'Authorization' : token
+        }
+        #print result
+        payload ={
+            'node_id': node_id,
+            'stat_type': stat_type,
+            'threshold_value': result['threshold_value'],
+            'threshold_type': threshold_type,
+            'threshold_level': threshold_level
+        }
+        #print token
+        t = ''
+        if threshold_level == 'alarm':
+            for x in result['action']:
+                #print x
+                t += ',' + result['action'][str(x)]
+        if len(t) > 0:
+            t =t[1:len(t)]
+        payload['action'] = t
+        #print payload
+        r = requests.post('http://vuon.dhct.tech/api/thresholds', headers=headers, data = payload)
+        print r.text
+        message = json.loads(str(r.text))
+        if message['status_code'] == 0:
+          sys.stdout.flush()
+          #print 'SEND CONFIG TO WEB SERVICE SUCCESS!'#, data.get_data()
+          sys.stdout.flush()
+          return True;
+        else:
+          #print 'SEND CONFIG TO WEB SERVICE SUCCESS!'
+          return False
+        #return True
+    except Exception as e:
+        raise e
+        print 'SEND CONFIG TO WEB SERVICE SUCCESS! error'
+        return False
 
-
-
-#import json
-
-#getConfig('00')
-#saveAlarm('00', 'airTemperature', 45, 'max', ['001:1:45','002:0:'])
+#print load_config('00')
+#saveAlarm('00', 'lightIntensity', 45, 'max', ['001:1:45','002:0:'])
 #saveWarning('00', 'airTemperature', 41, 'max',)

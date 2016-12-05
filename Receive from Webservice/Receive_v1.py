@@ -1,10 +1,11 @@
 import time
 import requests
 import json
+import sys
 class Rasp_Receive:
-    def __init__(self, mechanize, WEBSERVICE_IP,WEBSERVICE_PORT, FORM_INPUT_PATH, dat, cmd_id = 'cmd', rasp_id_id = 'rasp_id',password = 'pass'):
+    def __init__(self, config, WEBSERVICE_IP,WEBSERVICE_PORT, FORM_INPUT_PATH, dat, cmd_id = 'cmd', rasp_id_id = 'rasp_id',password = 'pass'):
        self.WEBSERVICE_PORT = WEBSERVICE_PORT
-       self.mechanize = mechanize
+       self.config = config
        self.WEBSERVICE_IP = WEBSERVICE_IP
        self.FORM_INPUT_PATH = FORM_INPUT_PATH
        self.cmd_id = cmd_id
@@ -19,7 +20,7 @@ class Rasp_Receive:
             'pass': '123456'
          }
          r = requests.post('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+self.FORM_INPUT_PATH, data=payload)
-         print r.text.strip()
+         #print r.text.strip()
          if len(r.text.strip()) > 0:
            t = r.text.strip().split(' ')
            #print len(r.text.strip())
@@ -29,42 +30,77 @@ class Rasp_Receive:
              print t[x][t[x].find(':')+1:len(t[x])], t[x][0:t[x].find(':')-1]
          return True
        except Exception, e:
+         raise e
          return False
     
-    def re_CMD(self, RASP_ID, PASS, Xbee):
-      r = requests.get('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+'/lenh')
-      #print r.text
-      jsondata = json.loads(r.text)
-      #print jsondata['data'][0]['lenh']
-      for x in xrange(0, len(jsondata['data'])):
-        print 'Received command: ', jsondata['data'][x]['lenh']
-        #Xbee.send_data( jsondata['data'][x]['lenh'], jsondata['data'][x]['id'])
-      
+    def re_CMD(self, RASP_ID, PASS, Xbee, config):
+      try:
+          payload = {'node_id': '1', 
+            'station_serial': config.STATION_ID,
+            'station_secret':config.STATION_PASS
+          }
+          r = requests.get('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+config.FORM_SEND_PATH, params=payload)
+          #print r.text
+          jsondata = json.loads(r.text)
+          #print jsondata['data']['result']
+          #print jsondata['data'][0]['lenh']
+          for x in jsondata['data']['result']:
+              sys.stdout.flush()
+              print 'RECIEVED COMMAND: ', x['action'],'for Node:', x['node_id']
+              Xbee.send_command( x['node_id'], x['action'].encode('ascii', 'ignore'))
+      except Exception, e:
+          raise e
+          print 'receive command error'
+          pass
 
-    def recieve_config(self, config):
+    def recieve_config(self, config, Xbee, gui):
       try:
          payload = {
-            'rasp_id': '00',
-            'pass': '123456'
+            'station_serial': config.STATION_ID,
+            'station_secret': config.STATION_PASS
          }
-         r = requests.post('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+'/demo_websocket/get_config.php', data=payload)
+         r = requests.get('http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+config.CONFIG_PATH, params=payload)
          #print 'http://' + self.WEBSERVICE_IP  +':'+self.WEBSERVICE_PORT+'/demo_websocket/get_config.php'
-         t = r.text.strip()
-         t = t[1:len(t)-1]
-         jsondata = json.loads(t)
-         #print jsondata
-         config.save_config(jsondata, json)
+         #print r.text
+         jsondata = json.loads(r.text)
+         #print jsondata['data']['result']
+         for x in jsondata['data']['result'].keys():
+            sys.stdout.flush()
+##            sys.stdout.flush()
+            print 'RECEIVED CONFIG FOR NODE: ', x
+            print jsondata['data']['result'][x], x
+            if config.save_config(jsondata['data']['result'][x], str(x)):
+                sys.stdout.flush()
+                config.load_config(str(x))
+                gui.refresh()
+                print 'SAVED TO REASPBERRY'
+                if Xbee.send_command(str(x),str('['+config.getConfig(str(x))+']').encode('ascii', 'ignore')):
+                    sys.stdout.flush()
+                    print 'SEND CONFIG TO NODE SUCCESS!', x
+                else:
+                    sys.stdout.flush()
+                    print 'SEND CONFIG TO NODE FAILED!', x
+            else:
+                sys.stdout.flush()
+                print 'Config of ',x, ' is not valid'
+                #return False
+         
          return True
       except Exception, e:
+         #raise e
+         print 'Receive config failed'
          return False
 
-    def rasp_listen(self, RASP_ID, PASS, Xbee, config):
+    def rasp_listen(self, RASP_ID, PASS, Xbee, config, gui):
+        i = 0
         while 1:
-          time.sleep(0.5)
-          #print '2'
-          self.re_CMD(RASP_ID, PASS, Xbee)
-          #print '1'
-          #self.recieve_config(config)
+          self.re_CMD(RASP_ID, PASS, Xbee, config)
+          if i == 10:
+              self.recieve_config(config, Xbee, gui)
+              i = 0
+          time.sleep(config.TIME_RECIEVE)
+          i = i + 1
+          
 
 
 #r =  requests.get('https://github.com')

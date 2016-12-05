@@ -4,12 +4,20 @@ import os
 
 class Sensor_data:
 	"""docstring for Sensor_data"""
-	def __init__(self, data, config, typeNode):
+	def __init__(self, data, config, typeNode = None):
 		t = data.split(',')
 		self.config = config
-		self.node_type = typeNode
-		self.day = time.strftime('%x')
-		if self.config.NODE_TYPE1 == typeNode:
+		self.node_type =  typeNode
+		if typeNode is None:
+                        if len(t) > 5:
+                                self.node_type = self.config.NODE_TYPE1
+                        else:
+                                self.node_type = self.config.NODE_TYPE2
+		#self.node_type = typeNode
+		#print data
+		self.day = time.strftime(' %d/%m/%Y')
+		if self.config.NODE_TYPE1 == self.node_type:
+                        #print '1'
 			self.time = t[0][1:len(t[0])]
 			self.nodeID = t[1][0:len(t[1])]
 			self.airTemperature = t[2][0:len(t[2])]
@@ -21,7 +29,8 @@ class Sensor_data:
 			self.winDirection = 'N/A'
 			self.Rain = 'N/A'
 
-		if self.config.NODE_TYPE2 == typeNode:
+		if self.config.NODE_TYPE2 == self.node_type:
+                        #print'1'
 			self.time = t[0][1:len(t[0])]
 			self.nodeID = t[1][0:len(t[1])]
 			self.windVelocity = t[2][0:len(t[2])]
@@ -31,11 +40,15 @@ class Sensor_data:
 			self.airHumidity = 'N/A'
 			self.soilTemperature = 'N/A'
 			self.soilMoisture = 'N/A'
-			self.lightIntensity = t[6][0:len(t[6])-1]
+			self.lightIntensity = t[4][0:len(t[4])-1]
+		
+
 			
 	def get_data(self):
-		return '('+self.time+','+self.nodeID+','+self.airTemperature+','+self.airHumidity+','+self.soilTemperature+','+self.soilMoisture+','+self.lightIntensity+')'
-		
+                if self.config.NODE_TYPE1 == self.node_type:
+                        return '('+self.time+','+self.nodeID+','+self.airTemperature+','+self.airHumidity+','+self.soilTemperature+','+self.soilMoisture+','+self.lightIntensity+')'
+		else:
+                        return '('+self.time+','+self.nodeID+','+self.windVelocity+','+self.winDirection+','+self.Rain+')'
 	def getTime(self):
 		return self.time
 	def getnodeID(self):
